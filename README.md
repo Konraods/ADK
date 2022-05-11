@@ -11,7 +11,7 @@ Temat grupy: Elektroniczna dokumentacja medyczna w kardiologii
     
     Aplikacja do edycji obrazów medycznych (upsampling, zaznaczanie interesujących fragmentów, budowa animacji z sekwencji obrazów, wykrywanie krawędzi)
     Autor: Konrad Jurkin
-    [Branch] (https://github.com/Konraods/ADK/tree/Konrad)
+    [Branch](https://github.com/Konraods/ADK/tree/Konrad)
     
     Aplikacja do edycji i podglądu wybranego dokumentu medycznego standardu HL7 - dynamiczna konstrukcja dokumentu o zmiennej strukturze
     Autor: Filip Kozera
