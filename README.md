@@ -1,5 +1,7 @@
 # Edycja obrazów
 
+Aplikacja służąca do edycji obrazów medycznych.
+
 # Instalacja modułów
 
 Użyj [pip](https://pip.pypa.io/en/stable/) żeby zainstalować:
