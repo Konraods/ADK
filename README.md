@@ -1,8 +1,7 @@
-#ADK
+# Analiza Danych w Kardiologii
+Temat grupy: Elektroniczna dokumentacja medyczna w kardiologii 
 
-Temat: Elektroniczna dokumentacja medyczna w kardiologii 
-
-Zadania:
+# Zadania dla członków grupy:
 
     Aplikacja do podglądu i opisu sygnału w wybranym formacie wymiany danych medycznych
     Autor: Agata Szymańska
