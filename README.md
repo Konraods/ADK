@@ -21,4 +21,4 @@ Autor: Konrad Jurkin
 [Edycja obrazów](https://github.com/Konraods/ADK/tree/Konrad)
 
 Autor: Filip Kozera
-[Placeholder](https://github.com/Konraods/ADK)
+[Placeholder](https://github.com/Konraods/ADK/tree/Filip)
