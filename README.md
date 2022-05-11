@@ -12,10 +12,10 @@ Temat grupy: Elektroniczna dokumentacja medyczna w kardiologii
 
     
 Autor: Agata Szymańska
-
+[Placeholder](https://github.com/Konraods/ADK)
 Autor: Anna Sobieralska
-
+[Placeholder](https://github.com/Konraods/ADK)
 Autor: Konrad Jurkin
-[App](https://github.com/Konraods/ADK/tree/Konrad)
-
+[Edycja obrazów](https://github.com/Konraods/ADK/tree/Konrad)
 Autor: Filip Kozera
+[Placeholder](https://github.com/Konraods/ADK)
