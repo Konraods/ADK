@@ -12,6 +12,7 @@ Aplikacja do podglądu i opisu obrazu w wybranym formacie wymiany danych medyczn
 Autor: Anna Sobieralska
 
 Aplikacja do edycji obrazów medycznych (upsampling, zaznaczanie interesujących fragmentów, budowa animacji z sekwencji obrazów, wykrywanie krawędzi)
+
 Autor: Konrad Jurkin
 [App](https://github.com/Konraods/ADK/tree/Konrad)
 
