@@ -1,2 +1,0 @@
-# ADK_projekt
-placeholder
