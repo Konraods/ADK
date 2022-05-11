@@ -5,6 +5,7 @@ import cv2
 
 global I_save
 
+
 # Image sequence section
 def read_img_seq():
     global path
@@ -104,12 +105,19 @@ def canny():
 
 
 def upsampling():
-    I_up = I_in
 
-    for i in range(int(e4.get())):
-        I_up = cv2.pyrUp(src=I_up)
 
-    cv2.imshow(winname="I_up", mat=I_up)
+    if int(e4.get()) >= 0:
+        for i in range(int(e4.get())):
+            I_up = cv2.pyrUp(src=I_up)
+
+        cv2.imshow(winname="I_up", mat=I_up)
+    else:
+        a = abs(int(e4.get()))
+        for i in range(a):
+            I_up = cv2.pyrDown(src=I_up)
+
+        cv2.imshow(winname="I_up", mat=I_up)
 
     return I_up
 
@@ -183,7 +191,7 @@ b11.grid(row=10, columnspan=3, sticky="nsew")
 b12.grid(row=11, columnspan=3, sticky="nsew")
 b13.grid(row=12, columnspan=2, sticky="nsew")
 
-e4.insert(0, "0-3")
+e4.insert(0, "-3 - 3")
 e4.grid(row=12, column=2, sticky="nsew")
 e4.bind("<FocusIn>", lambda args: e4.delete("0", "end"))
 
