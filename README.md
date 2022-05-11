@@ -15,7 +15,7 @@ Autor: Agata Szymańska
 [Placeholder](https://github.com/Konraods/ADK)
 
 Autor: Anna Sobieralska
-[Placeholder](https://github.com/Konraods/ADK)
+[Podgląd i opis obrazu](https://github.com/Konraods/ADK/tree/Podgl%C4%85d-i-opis-obrazu)
 
 Autor: Konrad Jurkin
 [Edycja obrazów](https://github.com/Konraods/ADK/tree/Konrad)
