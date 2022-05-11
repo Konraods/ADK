@@ -18,6 +18,5 @@ Temat grupy: Elektroniczna dokumentacja medyczna w kardiologii
     
 # Test
 Aplikacja do edycji obrazów medycznych (upsampling, zaznaczanie interesujących fragmentów, budowa animacji z sekwencji obrazów, wykrywanie krawędzi)
-    Autor: Konrad Jurkin
-    
-    [Branch](https://github.com/Konraods/ADK/tree/Konrad)
+Autor: Konrad Jurkin
+[Branch](https://github.com/Konraods/ADK/tree/Konrad)
