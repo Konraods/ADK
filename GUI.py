@@ -1,10 +1,11 @@
-import tkinter as tk
 from tkinter import *
+import tkinter as tk
 import easygui as eg
 import cv2
+import os
+import shutil
 
-global I_save
-
+global I_save, counter
 
 # Image sequence section
 def read_img_seq():
@@ -35,7 +36,7 @@ def show_sequence():
 
 
 def show_frame():
-    global frame
+    global frame, counter
     I_seq = cv2.VideoCapture(path)
     assert I_seq.isOpened()
     cv2.namedWindow("Animation", cv2.WINDOW_AUTOSIZE)
@@ -51,6 +52,8 @@ def show_frame():
 
     I_seq.release()
     cv2.destroyWindow("Animation")
+    cv2.imwrite(temp_path + "\ temp\ frame" + str(counter), frame)
+    counter += 1
     return frame
 
 
@@ -62,7 +65,7 @@ def save_frame():
 
 
 def read_img():
-    global I_in, I_grey, I_blur
+    global I_in, I_grey, I_blur, counter
 
     file = eg.fileopenbox()
     I_in = cv2.imread(file)
@@ -71,70 +74,124 @@ def read_img():
     # cv2.imshow(winname="I_grey", mat=I_grey)
     I_blur = cv2.GaussianBlur(I_grey, (3, 3), 0)
     # cv2.imshow(winname="I_blur", mat=I_blur)
+
+    I1 = temp_path + "\I_in" + str(counter) + ".jpg"
+    I2 = temp_path + "\I_grey" + str(counter) + ".jpg"
+    I3 = temp_path + "\I_blur" + str(counter) + ".jpg"
+
+    cv2.imwrite(I1, I_in)
+    cv2.imwrite(I2, I_grey)
+    cv2.imwrite(I3, I_blur)
+    counter += 1
     return I_in, I_grey, I_blur
 
 
 def edge_X():
+    global counter
+
     I_x = I_blur
     I_x = cv2.Sobel(src=I_x, ddepth=cv2.CV_64F, dx=1, dy=0, ksize=3)
     cv2.imshow(winname="I_x", mat=I_x)
+
+    I1 = temp_path + "\I_x" + str(counter) + ".jpg"
+    cv2.imwrite(I1, I_x)
+    counter += 1
     return I_x
 
 
 def edge_Y():
+    global counter
+
     I_y = I_blur
     I_y = cv2.Sobel(src=I_y, ddepth=cv2.CV_64F, dx=0, dy=1, ksize=3)
     cv2.imshow(winname="I_y", mat=I_y)
+
+    I1 = temp_path + "\I_y" + str(counter) + ".jpg"
+    cv2.imwrite(I1, I_y)
+    counter += 1
     return I_y
 
 
 def edge_XY():
+    global counter
+
     I_xy = I_blur
     I_xy = cv2.Sobel(src=I_xy, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=3)
     cv2.imshow(winname="I_xy", mat=I_xy)
+
+    I1 = temp_path + "\I_xy" + str(counter) + ".jpg"
+    cv2.imwrite(I1, I_xy)
+    counter += 1
     return I_xy
 
 
 def canny():
-    I_canny = I_blur
+    global counter
 
+    I_canny = I_blur
     I_canny = cv2.Canny(image=I_canny, threshold1=float(e2.get()), threshold2=float(e3.get()))
     cv2.imshow(winname="I_canny", mat=I_canny)
 
+    I1 = temp_path + "\I_canny" + str(counter) + ".jpg"
+    cv2.imwrite(I1, I_canny)
+    counter += 1
     return I_canny
 
 
 def upsampling():
-
+    global counter
+    I_up, I_down = I_in, I_in
 
     if int(e4.get()) >= 0:
         for i in range(int(e4.get())):
             I_up = cv2.pyrUp(src=I_up)
 
         cv2.imshow(winname="I_up", mat=I_up)
+        I1 = temp_path + "\I_up" + str(counter) + ".jpg"
+        cv2.imwrite(I1, I_up)
     else:
         a = abs(int(e4.get()))
         for i in range(a):
-            I_up = cv2.pyrDown(src=I_up)
+            I_down = cv2.pyrDown(src=I_down)
 
         cv2.imshow(winname="I_up", mat=I_up)
-
+        I2 = temp_path + "\I_down" + str(counter) + ".jpg"
+        cv2.imwrite(I2, I_down)
+    counter += 1
     return I_up
 
 
 def save_img():
+
     path = eg.diropenbox()
     full_path = path + "\ " + str(e5.get()) + ".jpg"
-    cv2.imwrite(full_path, )
+
+    print(list1.curselection())
+
 
 def exit():
+    shutil.rmtree(temp_path)
     root.destroy()
+
+
+def update():
+    dic = os.listdir(temp_path)
+    list1.delete(first=1, last=1)
+    for name in dic:
+        list1.insert('end', name)
 
 
 # Main window
 root = tk.Tk()
 root.title("Image processing app")
-root.geometry("650x850")
+root.geometry("650x850+0+0")
+
+# Creating temp folder for images
+temp_path = 'C:\ temp'
+isExist = os.path.exists(temp_path)
+
+if not isExist:
+    os.makedirs(temp_path)
 
 # Part for multiple images
 l1 = Label(master=root, text="Images sequence", font=13, width=66, height=5, bg="#d6d4d4")
@@ -158,7 +215,7 @@ b11 = Button(master=root, text="Marked fragments WIP", font=13, height=2, bg="#c
 b12 = Button(master=root, text="Search by pattern WIP", font=13, height=2, bg="#c0c0c0")
 b13 = Button(master=root, text="Upsampling", command=upsampling, font=13, height=2, bg="#c0c0c0")
 e4 = Entry(master=root, justify="center", bg="#c0c0c0")
-b14 = Button(master=root, text="Save image WIP", font=13, height=2, bg="#c0c0c0")
+b14 = Button(master=root, text="Save image WIP", command=save_img, font=13, height=2, bg="#c0c0c0")
 e5 = Entry(master=root, justify="center", bg="#c0c0c0")
 b15 = Button(master=root, text="Exit", command=exit, font=13, height=2, bg="#d6d4d4")
 
@@ -202,5 +259,15 @@ e5.insert(0, "Fill file name")
 e5.bind("<FocusIn>", lambda args: e5.delete("0", "end"))
 
 b15.grid(row=14, columnspan=3, sticky="nsew", ipady=10)
+
+counter = 0
+
+workspace = tk.Toplevel(root)
+workspace.title("Workspace")
+workspace.geometry("200x350+650+0")
+list1 = Listbox(master=workspace)
+b1 = Button(master=workspace, text="Update", command=update, font=13, height=2, bg="#d6d4d4")
+list1.pack(fill=BOTH, expand=1)
+b1.pack()
 
 root.mainloop()
