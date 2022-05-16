@@ -36,7 +36,8 @@ def show_sequence():
 
 
 def show_frame():
-    global frame, counter
+    global frame, counter, ret
+
     I_seq = cv2.VideoCapture(path)
     assert I_seq.isOpened()
     cv2.namedWindow("Animation", cv2.WINDOW_AUTOSIZE)
@@ -52,17 +53,17 @@ def show_frame():
 
     I_seq.release()
     cv2.destroyWindow("Animation")
-    cv2.imwrite(temp_path + "\ temp\ frame" + str(counter), frame)
-    counter += 1
-    return frame
+
+    return frame, ret
 
 
-# Do zmiany zapis
 def save_frame():
     path = eg.diropenbox()
-    full_path = path + "\ " + str(e1.get()) + ".jpg"
-    cv2.imwrite(full_path, frame)
+    #full_path = path + "\\" + str(e1.get()) + ".jpg"
+    # cv2.imwrite(full_path, frame)
 
+    I1 = temp_path + "\\frame_" + str(counter) + ".jpg"
+    cv2.imwrite(I1, frame)
 
 def read_img():
     global I_in, I_grey, I_blur, counter
@@ -75,9 +76,9 @@ def read_img():
     I_blur = cv2.GaussianBlur(I_grey, (3, 3), 0)
     # cv2.imshow(winname="I_blur", mat=I_blur)
 
-    I1 = temp_path + "\I_in" + str(counter) + ".jpg"
-    I2 = temp_path + "\I_grey" + str(counter) + ".jpg"
-    I3 = temp_path + "\I_blur" + str(counter) + ".jpg"
+    I1 = temp_path + "\\I_in" + str(counter) + ".jpg"
+    I2 = temp_path + "\\I_grey" + str(counter) + ".jpg"
+    I3 = temp_path + "\\I_blur" + str(counter) + ".jpg"
 
     cv2.imwrite(I1, I_in)
     cv2.imwrite(I2, I_grey)
@@ -93,7 +94,7 @@ def edge_X():
     I_x = cv2.Sobel(src=I_x, ddepth=cv2.CV_64F, dx=1, dy=0, ksize=3)
     cv2.imshow(winname="I_x", mat=I_x)
 
-    I1 = temp_path + "\I_x" + str(counter) + ".jpg"
+    I1 = temp_path + "\\I_x" + str(counter) + ".jpg"
     cv2.imwrite(I1, I_x)
     counter += 1
     return I_x
@@ -106,7 +107,7 @@ def edge_Y():
     I_y = cv2.Sobel(src=I_y, ddepth=cv2.CV_64F, dx=0, dy=1, ksize=3)
     cv2.imshow(winname="I_y", mat=I_y)
 
-    I1 = temp_path + "\I_y" + str(counter) + ".jpg"
+    I1 = temp_path + "\\I_y" + str(counter) + ".jpg"
     cv2.imwrite(I1, I_y)
     counter += 1
     return I_y
@@ -119,7 +120,7 @@ def edge_XY():
     I_xy = cv2.Sobel(src=I_xy, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=3)
     cv2.imshow(winname="I_xy", mat=I_xy)
 
-    I1 = temp_path + "\I_xy" + str(counter) + ".jpg"
+    I1 = temp_path + "\\I_xy" + str(counter) + ".jpg"
     cv2.imwrite(I1, I_xy)
     counter += 1
     return I_xy
@@ -132,7 +133,7 @@ def canny():
     I_canny = cv2.Canny(image=I_canny, threshold1=float(e2.get()), threshold2=float(e3.get()))
     cv2.imshow(winname="I_canny", mat=I_canny)
 
-    I1 = temp_path + "\I_canny" + str(counter) + ".jpg"
+    I1 = temp_path + "\\I_canny" + str(counter) + ".jpg"
     cv2.imwrite(I1, I_canny)
     counter += 1
     return I_canny
@@ -147,7 +148,7 @@ def upsampling():
             I_up = cv2.pyrUp(src=I_up)
 
         cv2.imshow(winname="I_up", mat=I_up)
-        I1 = temp_path + "\I_up" + str(counter) + ".jpg"
+        I1 = temp_path + "\\I_up" + str(counter) + ".jpg"
         cv2.imwrite(I1, I_up)
     else:
         a = abs(int(e4.get()))
@@ -155,19 +156,23 @@ def upsampling():
             I_down = cv2.pyrDown(src=I_down)
 
         cv2.imshow(winname="I_up", mat=I_up)
-        I2 = temp_path + "\I_down" + str(counter) + ".jpg"
+        I2 = temp_path + "\\I_down" + str(counter) + ".jpg"
         cv2.imwrite(I2, I_down)
     counter += 1
     return I_up
 
 
+
 def save_img():
 
     path = eg.diropenbox()
-    full_path = path + "\ " + str(e5.get()) + ".jpg"
 
     print(list1.curselection())
+    dir = os.listdir(temp_path)
 
+    for i in list1.curselection():
+        src_path = temp_path + "\\" + str(dir[i])
+        shutil.copy2(src_path, path)
 
 def exit():
     shutil.rmtree(temp_path)
@@ -176,7 +181,8 @@ def exit():
 
 def update():
     dic = os.listdir(temp_path)
-    list1.delete(first=1, last=1)
+    list1.delete(0, END)
+
     for name in dic:
         list1.insert('end', name)
 
@@ -187,7 +193,7 @@ root.title("Image processing app")
 root.geometry("650x850+0+0")
 
 # Creating temp folder for images
-temp_path = 'C:\ temp'
+temp_path = 'C:\\Images_temp'
 isExist = os.path.exists(temp_path)
 
 if not isExist:
@@ -265,9 +271,10 @@ counter = 0
 workspace = tk.Toplevel(root)
 workspace.title("Workspace")
 workspace.geometry("200x350+650+0")
-list1 = Listbox(master=workspace)
+list1 = Listbox(master=workspace, selectmode="multiple")
 b1 = Button(master=workspace, text="Update", command=update, font=13, height=2, bg="#d6d4d4")
 list1.pack(fill=BOTH, expand=1)
 b1.pack()
 
 root.mainloop()
+
