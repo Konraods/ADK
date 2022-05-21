@@ -16,88 +16,114 @@ import os
 import shutil
 
 
-global I_save, counter
-
-
 # Image sequence section
 def read_img_seq():
     global path, counter, subcounter
 
     path = eg.diropenbox()
-    path = path + str("\%01d.jpg")
-    counter += 1
-    subcounter = 0
+    if path is None:
+        e_l1.config(text="The path is empty")
+    else:
+        path = path + str("\%01d.jpg")
+        counter += 1
+        subcounter = 0
 
     return path
 
 
 def show_sequence():
-    I_seq = cv2.VideoCapture(path)
-    assert I_seq.isOpened()
-    cv2.namedWindow(winname="Animation", flags=cv2.WINDOW_AUTOSIZE)
-    while True:
-        ret, frame = I_seq.read()
-        if not ret:
-            break
+    if path is None:
+        e_l1.config(text="The path is empty")
+    else:
+        try:
+            I_seq = cv2.VideoCapture(path)
+            assert I_seq.isOpened()
+            cv2.namedWindow(winname="Animation", flags=cv2.WINDOW_AUTOSIZE)
+            while True:
+                ret, frame = I_seq.read()
+                if not ret:
+                    break
 
-        cv2.imshow(winname="Animation", mat=frame)
+                cv2.imshow(winname="Animation", mat=frame)
 
-        if cv2.waitKey(200) != -1:
+                if cv2.waitKey(200) != -1:
+                    cv2.destroyWindow(winname="Animation")
+                    break
             cv2.destroyWindow(winname="Animation")
-            break
-    cv2.destroyWindow(winname="Animation")
-    I_seq.release()
+            I_seq.release()
+        except:
+            e_l1.config(text="Images name should be numbers e.g. 1, 2 etc.")
 
 
 def show_frame():
     global frame, counter, subcounter
 
-    I_seq = cv2.VideoCapture(path)
-    assert I_seq.isOpened()
-    cv2.namedWindow(winname="Animation", flags=cv2.WINDOW_AUTOSIZE)
-    while True:
-        ret, frame = I_seq.read()
-        if not ret:
-            break
+    if path is None:
+        e_l1.config(text="The path is empty")
+    else:
+        try:
+            I_seq = cv2.VideoCapture(path)
+            assert I_seq.isOpened()
+            cv2.namedWindow(winname="Animation", flags=cv2.WINDOW_AUTOSIZE)
+            while True:
+                ret, frame = I_seq.read()
+                if not ret:
+                    break
 
-        cv2.imshow(winname="Animation", mat=frame)
+                cv2.imshow(winname="Animation", mat=frame)
 
-        if cv2.waitKey() == 27:
-            break
+                if cv2.waitKey() == 27:
+                    break
 
-    I_seq.release()
-    cv2.destroyWindow(winname="Animation")
+            I_seq.release()
+            cv2.destroyWindow(winname="Animation")
 
-    I1 = temp_path + "\\" + str(counter) + "_frame_" + str(subcounter) + ".jpg"
-    cv2.imwrite(filename=I1, img=frame)
-    subcounter += 1
-
-    return frame
+            I1 = temp_path + "\\" + str(counter) + "_frame_" + str(subcounter) + ".jpg"
+            cv2.imwrite(filename=I1, img=frame)
+            subcounter += 1
+            return frame
+        except:
+            e_l1.config(text="Images name should be numbers e.g. 1, 2 etc.")
 
 
 def read_img():
     global I_in, I_grey, I_blur, counter, subcounter, subcounter_up, subcounter_down, subcounter_mark
-
     counter += 1
     subcounter, subcounter_up, subcounter_down, subcounter_mark = 0, 0, 0, 0
 
     file = eg.fileopenbox()
-    I_in = cv2.imread(filename=file)
-    cv2.imshow(winname="I_in", mat=I_in)
-    I_grey = cv2.cvtColor(src=I_in, code=cv2.COLOR_BGR2GRAY)
-    # cv2.imshow(winname="I_grey", mat=I_grey)
-    I_blur = cv2.GaussianBlur(I_grey, (3, 3), 0)
-    # cv2.imshow(winname="I_blur", mat=I_blur)
+    if file is None:
+        e_l1.config(text="The selected image isn't loaded")
+    else:
+        try:
+            I_in = cv2.imread(filename=file)
+            if I_in is None:
+                e_l1.config(text="File extension is wrong")
+            else:
+                cv2.imshow(winname="I_in", mat=I_in)
+                I_grey = cv2.cvtColor(src=I_in, code=cv2.COLOR_BGR2GRAY)
+                # cv2.imshow(winname="I_grey", mat=I_grey)
+                I_blur = cv2.GaussianBlur(I_grey, (3, 3), 0)
+                # cv2.imshow(winname="I_blur", mat=I_blur)
 
-    I1 = temp_path + "\\" + str(counter) + "_I_in_" + str(subcounter) + ".jpg"
-    I2 = temp_path + "\\" + str(counter) + "_I_grey_" + str(subcounter) + ".jpg"
-    I3 = temp_path + "\\" + str(counter) + "_I_blur_" + str(subcounter) + ".jpg"
+                I1 = temp_path + "\\" + str(counter) + "_I_in_" + str(subcounter) + ".jpg"
+                I2 = temp_path + "\\" + str(counter) + "_I_grey_" + str(subcounter) + ".jpg"
+                I3 = temp_path + "\\" + str(counter) + "_I_blur_" + str(subcounter) + ".jpg"
 
-    cv2.imwrite(filename=I1, img=I_in)
-    cv2.imwrite(filename=I2, img=I_grey)
-    cv2.imwrite(filename=I3, img=I_blur)
+                cv2.imwrite(filename=I1, img=I_in)
+                cv2.imwrite(filename=I2, img=I_grey)
+                cv2.imwrite(filename=I3, img=I_blur)
 
-    return I_in, I_grey, I_blur
+                b7["state"] = "normal"
+                b8["state"] = "normal"
+                b9["state"] = "normal"
+                b10["state"] = "normal"
+                b11["state"] = "normal"
+                b12["state"] = "normal"
+                b13["state"] = "normal"
+                return I_in, I_grey, I_blur
+        except:
+            e_l1.config(text="File extension is wrong")
 
 
 def edge_X():
@@ -138,16 +164,18 @@ def edge_XY():
 
 def canny():
     global counter, subcounter
+    if (e2.get() or e3.get()) is None:
+        e_l1.config(text="Threshold 1 or 2 - empty")
+    else:
+        I_canny = I_blur
+        I_canny = cv2.Canny(image=I_canny, threshold1=float(e2.get()), threshold2=float(e3.get()))
+        cv2.imshow(winname="I_canny", mat=I_canny)
 
-    I_canny = I_blur
-    I_canny = cv2.Canny(image=I_canny, threshold1=float(e2.get()), threshold2=float(e3.get()))
-    cv2.imshow(winname="I_canny", mat=I_canny)
+        I1 = temp_path + "\\" + str(counter) + "_I_canny_" + str(subcounter) + ".jpg"
+        cv2.imwrite(filename=I1, img=I_canny)
+        subcounter += 1
 
-    I1 = temp_path + "\\" + str(counter) + "_I_canny_" + str(subcounter) + ".jpg"
-    cv2.imwrite(filename=I1, img=I_canny)
-    subcounter += 1
-
-    return I_canny
+        return I_canny
 
 
 def upsampling():
@@ -162,6 +190,7 @@ def upsampling():
         I1 = temp_path + "\\" + str(counter) + "_I_up_" + str(subcounter) + ".jpg"
         cv2.imwrite(filename=I1, img=I_up)
         subcounter_up += 1
+        return I_up
 
     elif -4 < int(e4.get()) <= 0:
         a = abs(int(e4.get()))
@@ -173,8 +202,9 @@ def upsampling():
         cv2.imwrite(filename=I2, img=I_down)
         subcounter_down += 1
 
-    return I_up, I_down
-
+        return I_down
+    else:
+        e_l1.config(text="Enter value between -3 and 3")
 
 def mark_img():
     global subcounter_mark
@@ -206,6 +236,31 @@ def mark_img():
     cv2.imwrite(filename=I1, img=I_mark)
     subcounter_mark += 1
     cv2.destroyWindow(winname="I_mark")
+
+
+def search_pattern():
+    global I_in, Pattern
+
+    top_left = []
+    bottom_right = []
+    cv2.imshow(winname="Pattern", mat=I_in)
+
+    def selectPattern(action, x, y, flags, *userdata):
+        global top_left, bottom_right, I_grey
+
+        if action == cv2.EVENT_LBUTTONDOWN:
+            top_left = [(x, y)]
+        elif action == cv2.EVENT_LBUTTONUP:
+            bottom_right = [(x, y)]
+            Pattern = I_in[top_left[0][0]:bottom_right[0][0], top_left[0][1]:bottom_right[0][1]]
+
+            Pattern = cv2.cvtColor(src=Pattern, code=cv2.COLOR_BGR2GRAY)
+            ret, Pattern = cv2.threshold(Pattern, 127, 255, cv2.THRESH_BINARY)
+            cv2.imwrite(filename="Pattern_bin.jpg", img=Pattern)
+            ret, I_grey = cv2.threshold(I_grey, 127, 255, cv2.THRESH_BINARY)
+            cv2.imwrite(filename="I_bin.jpg", img=I_grey)
+
+    cv2.setMouseCallback("Pattern", selectPattern)
 
 
 def exit():  # Function to delete temp folder for images and close main window
@@ -251,15 +306,15 @@ b3 = Button(master=root, text="Frame by frame", command=show_frame, font=13, hei
 l2 = Label(master=root, text="Single image", font=13, width=66, height=5, bg="#d6d4d4")
 b5 = Button(master=root, text="Read image", command=read_img, font=13, height=2, bg="#c0c0c0")
 l3 = Label(master=root, text="Edge detection", font=13, height=2, bg="#d6d4d4")
-b7 = Button(master=root, text="X", command=edge_X, font=13, height=2, bg="#c0c0c0")
-b8 = Button(master=root, text="Y", command=edge_Y, font=13, height=2, bg="#c0c0c0")
-b9 = Button(master=root, text="X+Y", command=edge_XY, font=13, height=2, bg="#c0c0c0")
-b10 = Button(master=root, text="Canny", command=canny, font=13, height=2, bg="#c0c0c0")
+b7 = Button(master=root, text="X", command=edge_X, font=13, height=2, bg="#c0c0c0", state=DISABLED)
+b8 = Button(master=root, text="Y", command=edge_Y, font=13, height=2, bg="#c0c0c0", state=DISABLED)
+b9 = Button(master=root, text="X+Y", command=edge_XY, font=13, height=2, bg="#c0c0c0", state=DISABLED)
+b10 = Button(master=root, text="Canny", command=canny, font=13, height=2, bg="#c0c0c0", state=DISABLED)
 e2 = Entry(master=root, justify="center", bg="#c0c0c0")
 e3 = Entry(master=root, justify="center", bg="#c0c0c0")
-b11 = Button(master=root, text="Marked fragments WIP", command=mark_img, font=13, height=2, bg="#c0c0c0")
-b12 = Button(master=root, text="Search by pattern WIP", font=13, height=2, bg="#c0c0c0")
-b13 = Button(master=root, text="Upsampling", command=upsampling, font=13, height=2, bg="#c0c0c0")
+b11 = Button(master=root, text="Marked fragments", command=mark_img, font=13, height=2, bg="#c0c0c0", state=DISABLED)
+b12 = Button(master=root, text="Search by pattern WIP", command=search_pattern, font=13, height=2, bg="#c0c0c0", state=DISABLED)
+b13 = Button(master=root, text="Upsampling", command=upsampling, font=13, height=2, bg="#c0c0c0", state=DISABLED)
 e4 = Entry(master=root, justify="center", bg="#c0c0c0")
 b14 = Button(master=root, text="Exit", command=exit, font=13, height=2, bg="#d6d4d4")
 
@@ -268,7 +323,6 @@ l1.grid(row=0, columnspan=3, sticky="nsew")
 b1.grid(row=1, columnspan=3, sticky="nsew")
 b2.grid(row=2, columnspan=3, sticky="nsew")
 b3.grid(row=3, columnspan=3, sticky="nsew")
-
 
 # Grid settings for single image
 l2.grid(row=4, columnspan=3, sticky="nsew")
@@ -296,8 +350,6 @@ e4.insert(0, "-3 - 3")
 e4.grid(row=13, column=2, sticky="nsew")
 e4.bind("<FocusIn>", lambda args: e4.delete("0", "end"))
 
-# Define counters
-counter, subcounter, subcounter_up, subcounter_down, subcounter_mark = 0, 0, 0, 0, 0
 
 # Workspace window to select and save images
 workspace = tk.Toplevel(master=root)
@@ -315,6 +367,19 @@ b1.pack(fill=X)
 b2.pack(fill=X)
 
 
+# Errors window
+error = tk.Toplevel(master=root)
+error.title("Error")
+error.geometry("200x350+650-300")
+
+# Label and pack settings for window
+e_l1 = Label(master=error, text="No errors", fg='#F00', font=30, wraplength=180)
+e_l1.pack(fill=BOTH, expand=1)
+
+# Define counters
+counter, subcounter, subcounter_up, subcounter_down, subcounter_mark = 0, 0, 0, 0, 0
+
+
 def on_closing():  # Function to close window and delete temp folder
     if messagebox.askokcancel(title="Quit", message="Do you want to quit?"):
         shutil.rmtree(path=temp_path)
@@ -327,5 +392,5 @@ def block_closing():  # Function to prevent closing workspace window
 
 root.protocol(name="WM_DELETE_WINDOW", func=on_closing)
 workspace.protocol(name="WM_DELETE_WINDOW", func=block_closing)
+error.protocol(name="WM_DELETE_WINDOW", func=block_closing)
 root.mainloop()
-
