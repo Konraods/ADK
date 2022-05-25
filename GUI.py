@@ -27,7 +27,7 @@ def read_img_seq():
         path = path + str("\%01d.jpg")
         counter += 1
         subcounter = 0
-
+        e_l1.config(text="OK")
     return path
 
 
@@ -51,6 +51,7 @@ def show_sequence():
                     break
             cv2.destroyWindow(winname="Animation")
             I_seq.release()
+            e_l1.config(text="OK")
         except:
             e_l1.config(text="Images name should be numbers e.g. 1, 2 etc.")
 
@@ -81,6 +82,7 @@ def show_frame():
             I1 = temp_path + "\\" + str(counter) + "_frame_" + str(subcounter) + ".jpg"
             cv2.imwrite(filename=I1, img=frame)
             subcounter += 1
+            e_l1.config(text="OK")
             return frame
         except:
             e_l1.config(text="Images name should be numbers e.g. 1, 2 etc.")
@@ -121,6 +123,7 @@ def read_img():
                 b11["state"] = "normal"
                 b12["state"] = "normal"
                 b13["state"] = "normal"
+                e_l1.config(text="OK")
                 return I_in, I_grey, I_blur
         except:
             e_l1.config(text="File extension is wrong")
@@ -164,7 +167,9 @@ def edge_XY():
 
 def canny():
     global counter, subcounter
-    if (e2.get() or e3.get()) is None:
+    if (e2.get() or e3.get()) == "":
+        e_l1.config(text="Threshold 1 or 2 - empty")
+    elif e2.get() == "Treshold 1" or e3.get() == "Treshold 2":
         e_l1.config(text="Threshold 1 or 2 - empty")
     else:
         I_canny = I_blur
@@ -174,7 +179,7 @@ def canny():
         I1 = temp_path + "\\" + str(counter) + "_I_canny_" + str(subcounter) + ".jpg"
         cv2.imwrite(filename=I1, img=I_canny)
         subcounter += 1
-
+        e_l1.config(text="OK")
         return I_canny
 
 
@@ -190,6 +195,7 @@ def upsampling():
         I1 = temp_path + "\\" + str(counter) + "_I_up_" + str(subcounter) + ".jpg"
         cv2.imwrite(filename=I1, img=I_up)
         subcounter_up += 1
+        e_l1.config(text="OK")
         return I_up
 
     elif -4 < int(e4.get()) <= 0:
@@ -201,7 +207,7 @@ def upsampling():
         I2 = temp_path + "\\" + str(counter) + "_I_down_" + str(subcounter) + ".jpg"
         cv2.imwrite(filename=I2, img=I_down)
         subcounter_down += 1
-
+        e_l1.config(text="OK")
         return I_down
     else:
         e_l1.config(text="Enter value between -3 and 3")
@@ -232,6 +238,7 @@ def mark_img():
         cv2.imshow(winname="I_mark", mat=I_mark)
         keyboard = cv2.waitKey(0)
 
+    e_l1.config(text="OK")
     I1 = temp_path + "\\" + str(counter) + "_I_mark_" + str(subcounter) + ".jpg"
     cv2.imwrite(filename=I1, img=I_mark)
     subcounter_mark += 1
@@ -394,3 +401,5 @@ root.protocol(name="WM_DELETE_WINDOW", func=on_closing)
 workspace.protocol(name="WM_DELETE_WINDOW", func=block_closing)
 error.protocol(name="WM_DELETE_WINDOW", func=block_closing)
 root.mainloop()
+
+
