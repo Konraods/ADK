@@ -15,6 +15,8 @@ import cv2
 import os
 import shutil
 
+global path
+path = None
 
 # Image sequence section
 def read_img_seq():
@@ -121,7 +123,6 @@ def read_img():
                 b9["state"] = "normal"
                 b10["state"] = "normal"
                 b11["state"] = "normal"
-                b12["state"] = "normal"
                 b13["state"] = "normal"
                 e_l1.config(text="OK")
                 return I_in, I_grey, I_blur
@@ -228,7 +229,7 @@ def mark_img():
             top_left = [(x, y)]
         elif action == cv2.EVENT_LBUTTONUP:
             bottom_right = [(x, y)]
-            cv2.rectangle(I_mark, top_left[0], bottom_right[0], (255, 50, 25), 1, 8)
+            cv2.rectangle(I_mark, top_left[0], bottom_right[0], (255, 0, 0), 1, 8)
             cv2.imshow(winname="I_mark", mat=I_mark)
 
     cv2.setMouseCallback("I_mark", drawRectangle)
@@ -243,31 +244,6 @@ def mark_img():
     cv2.imwrite(filename=I1, img=I_mark)
     subcounter_mark += 1
     cv2.destroyWindow(winname="I_mark")
-
-
-def search_pattern():
-    global I_in, Pattern
-
-    top_left = []
-    bottom_right = []
-    cv2.imshow(winname="Pattern", mat=I_in)
-
-    def selectPattern(action, x, y, flags, *userdata):
-        global top_left, bottom_right, I_grey
-
-        if action == cv2.EVENT_LBUTTONDOWN:
-            top_left = [(x, y)]
-        elif action == cv2.EVENT_LBUTTONUP:
-            bottom_right = [(x, y)]
-            Pattern = I_in[top_left[0][0]:bottom_right[0][0], top_left[0][1]:bottom_right[0][1]]
-
-            Pattern = cv2.cvtColor(src=Pattern, code=cv2.COLOR_BGR2GRAY)
-            ret, Pattern = cv2.threshold(Pattern, 127, 255, cv2.THRESH_BINARY)
-            cv2.imwrite(filename="Pattern_bin.jpg", img=Pattern)
-            ret, I_grey = cv2.threshold(I_grey, 127, 255, cv2.THRESH_BINARY)
-            cv2.imwrite(filename="I_bin.jpg", img=I_grey)
-
-    cv2.setMouseCallback("Pattern", selectPattern)
 
 
 def exit():  # Function to delete temp folder for images and close main window
@@ -295,7 +271,7 @@ def save_img():  # Function to save selected images from list to chosen dic
 # Main window
 root = tk.Tk()
 root.title("Image processing app")
-root.geometry("650x750+0+0")
+root.geometry("650x700+0+0")
 
 # Creating temp folder for images
 temp_path = 'C:\\Images_temp'
@@ -320,7 +296,6 @@ b10 = Button(master=root, text="Canny", command=canny, font=13, height=2, bg="#c
 e2 = Entry(master=root, justify="center", bg="#c0c0c0")
 e3 = Entry(master=root, justify="center", bg="#c0c0c0")
 b11 = Button(master=root, text="Marked fragments", command=mark_img, font=13, height=2, bg="#c0c0c0", state=DISABLED)
-b12 = Button(master=root, text="Search by pattern WIP", command=search_pattern, font=13, height=2, bg="#c0c0c0", state=DISABLED)
 b13 = Button(master=root, text="Upsampling", command=upsampling, font=13, height=2, bg="#c0c0c0", state=DISABLED)
 e4 = Entry(master=root, justify="center", bg="#c0c0c0")
 b14 = Button(master=root, text="Exit", command=exit, font=13, height=2, bg="#d6d4d4")
@@ -340,7 +315,6 @@ b8.grid(row=7, column=1, sticky="w", ipadx=100)
 b9.grid(row=7, column=2, sticky="e", ipadx=80)
 b10.grid(row=8, column=0, sticky="nsew")
 b11.grid(row=11, columnspan=3, sticky="nsew")
-b12.grid(row=12, columnspan=3, sticky="nsew")
 b13.grid(row=13, columnspan=2, sticky="nsew")
 b14.grid(row=15, columnspan=3, sticky="nsew", ipady=10)
 
@@ -377,7 +351,7 @@ b2.pack(fill=X)
 # Errors window
 error = tk.Toplevel(master=root)
 error.title("Error")
-error.geometry("200x350+650-300")
+error.geometry("200x320+650-340")
 
 # Label and pack settings for window
 e_l1 = Label(master=error, text="No errors", fg='#F00', font=30, wraplength=180)
