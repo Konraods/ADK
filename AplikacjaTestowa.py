@@ -1,4 +1,6 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QLabel, QToolBar, QStatusBar
+import hl7
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QLabel, QToolBar, QStatusBar, \
+    QFileDialog
 from PySide6.QtCore import Slot, QSize
 from PySide6.QtGui import QCloseEvent, QAction, QIcon
 import sys
@@ -49,8 +51,31 @@ class Window(QMainWindow):
 
         file_menu = menu.addMenu(QIcon('folder.jpg'), "&File")
         file_menu.addAction(button_action)
+        file_menu.triggered.connect(self.pushButton)
 
         self.show()
+
+
+    def pushButton(self):
+        print("Button pressed")
+        self.open_dialog_box()
+
+    def open_dialog_box(self):
+        filename = QFileDialog.getOpenFileName()
+        path = filename[0]
+        print(path)
+
+        a = 0
+        with open(path, "r") as f:
+            for line in f:
+                if a == 0:
+                    message = line
+                    a = 1
+                else:
+                    message += line
+        h = hl7.parse(message)
+        for line in h:
+            print(line)
 
     def onMyToolBarButtonClick(self, s):
         print("click", s)
