@@ -9,8 +9,11 @@ Functions to edit images are from opencv2 module (for now)
 
 from tkinter import *
 from tkinter import messagebox
+
+import numpy as np
 import tkinter as tk
 import easygui as eg
+import pywt
 import cv2
 import os
 import shutil
@@ -91,7 +94,7 @@ def show_frame():
 
 
 def read_img():
-    global I_in, I_grey, I_blur, counter, subcounter, subcounter_up, subcounter_down, subcounter_mark
+    global I_in, I_grey, I_blur, counter, subcounter, subcounter_up, subcounter_down, subcounter_mark, cV, cD, cH
     counter += 1
     subcounter, subcounter_up, subcounter_down, subcounter_mark = 0, 0, 0, 0
 
@@ -114,6 +117,11 @@ def read_img():
                 I2 = temp_path + "\\" + str(counter) + "_I_grey_" + str(subcounter) + ".jpg"
                 I3 = temp_path + "\\" + str(counter) + "_I_blur_" + str(subcounter) + ".jpg"
 
+                # Wavelet DWT
+                # Grey
+                DWT = pywt.dwt2(I_grey, 'haar')
+                cA, (cH, cV, cD) = DWT
+
                 cv2.imwrite(filename=I1, img=I_in)
                 cv2.imwrite(filename=I2, img=I_grey)
                 cv2.imwrite(filename=I3, img=I_blur)
@@ -125,17 +133,24 @@ def read_img():
                 b11["state"] = "normal"
                 b13["state"] = "normal"
                 e_l1.config(text="OK")
-                return I_in, I_grey, I_blur
+                return I_in, I_grey, I_blur, cV
         except:
             e_l1.config(text="File extension is wrong")
 
 
 def edge_X():
-    global counter, subcounter
+    global counter, subcounter, cV
 
     I_x = I_blur
     I_x = cv2.Sobel(src=I_x, ddepth=cv2.CV_64F, dx=1, dy=0, ksize=3)
     cv2.imshow(winname="I_x", mat=I_x)
+
+    cA = cV
+    cH, cV, cD = None, None, None
+    I_rec = pywt.idwt2((cA, (cH, cV, cD)), 'haar')
+    I_rec = np.uint8(I_rec)
+    cv2.imshow("DWT_x", I_rec)
+
 
     I1 = temp_path + "\\" + str(counter) + "_I_x_" + str(subcounter) + ".jpg"
     cv2.imwrite(filename=I1, img=I_x)
@@ -143,11 +158,18 @@ def edge_X():
 
 
 def edge_Y():
-    global counter
+    global counter, cH
 
     I_y = I_blur
     I_y = cv2.Sobel(src=I_y, ddepth=cv2.CV_64F, dx=0, dy=1, ksize=3)
     cv2.imshow(winname="I_y", mat=I_y)
+
+    cA = cH
+    cH, cV, cD = None, None, None
+    I_rec = pywt.idwt2((cA, (cH, cV, cD)), 'haar')
+    I_rec = np.uint8(I_rec)
+    cv2.imshow("DWT_y", I_rec)
+
 
     I1 = temp_path + "\\" + str(counter) + "_I_y_" + str(subcounter) + ".jpg"
     cv2.imwrite(filename=I1, img=I_y)
@@ -155,11 +177,17 @@ def edge_Y():
 
 
 def edge_XY():
-    global counter
+    global counter, cD
 
     I_xy = I_blur
     I_xy = cv2.Sobel(src=I_xy, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=3)
     cv2.imshow(winname="I_xy", mat=I_xy)
+
+    cA = cD
+    cH, cV, cD = None, None, None
+    I_rec = pywt.idwt2((cA, (cH, cV, cD)), 'haar')
+    I_rec = np.uint8(I_rec)
+    cv2.imshow("DWT_xy", I_rec)
 
     I1 = temp_path + "\\" + str(counter) + "_I_xy_" + str(subcounter) + ".jpg"
     cv2.imwrite(filename=I1, img=I_xy)
@@ -168,7 +196,7 @@ def edge_XY():
 
 def canny():
     global counter, subcounter
-    if (e2.get() or e3.get()) == "":
+    if e2.get() == "" or e3.get() == "":
         e_l1.config(text="Threshold 1 or 2 - empty")
     elif e2.get() == "Treshold 1" or e3.get() == "Treshold 2":
         e_l1.config(text="Threshold 1 or 2 - empty")
@@ -184,34 +212,88 @@ def canny():
         return I_canny
 
 
+def upsmpl():
+    global I_rec
+
+    (B, G, R) = cv2.split(I_rec)
+
+    I_rec = B
+    cA = I_rec
+    cH, cV, cD = None, None, None
+    I_rec = pywt.idwt2((cA, (cH, cV, cD)), 'haar')
+
+    I_rec1 = G
+    cA = I_rec1
+    cH, cV, cD = None, None, None
+    I_rec1 = pywt.idwt2((cA, (cH, cV, cD)), 'haar')
+
+    I_rec2 = R
+    cA = I_rec2
+    cH, cV, cD = None, None, None
+    I_rec2 = pywt.idwt2((cA, (cH, cV, cD)), 'haar')
+
+    merged = cv2.merge([I_rec, I_rec1, I_rec2])
+    I_rec = np.uint8(merged)
+
+def dwsmpl():
+    global I_rec
+
+    (B, G, R) = cv2.split(I_rec)
+
+    # Blue
+    DWTb = pywt.dwt2(B, 'haar')
+    cAb, (cHb, cVb, cDb) = DWTb
+
+    # Green
+    DWTg = pywt.dwt2(G, 'haar')
+    cAg, (cHg, cVg, cDg) = DWTg
+
+    # Red
+    DWTr = pywt.dwt2(R, 'haar')
+    cAr, (cHr, cVr, cDr) = DWTr
+
+    merged = cv2.merge([(cAb + cHb + cVb + cDb) / 4, (cAg + cHg + cVg + cDg) / 4, (cAr + cHr + cVr + cDr) / 4])
+    I_rec = np.uint8(merged)
+
 def upsampling():
-    global counter, subcounter, subcounter_up, subcounter_down
+    global counter, subcounter, subcounter_up, subcounter_down, I_rec
+
     I_up, I_down = I_in, I_in
+    I_rec = I_in
 
-    if 0 <= int(e4.get()) < 4:
-        for i in range(int(e4.get())):
-            I_up = cv2.pyrUp(src=I_up)
-
-        cv2.imshow(winname="I_up", mat=I_up)
-        I1 = temp_path + "\\" + str(counter) + "_I_up_" + str(subcounter) + ".jpg"
-        cv2.imwrite(filename=I1, img=I_up)
-        subcounter_up += 1
-        e_l1.config(text="OK")
-        return I_up
-
-    elif -4 < int(e4.get()) <= 0:
-        a = abs(int(e4.get()))
-        for i in range(a):
-            I_down = cv2.pyrDown(src=I_down)
-
-        cv2.imshow(winname="I_down", mat=I_down)
-        I2 = temp_path + "\\" + str(counter) + "_I_down_" + str(subcounter) + ".jpg"
-        cv2.imwrite(filename=I2, img=I_down)
-        subcounter_down += 1
-        e_l1.config(text="OK")
-        return I_down
+    if e4.get() == "":
+        e_l1.config(text="Empty box")
+    elif e4.get() == "-3 - 3":
+        e_l1.config(text="Fill the box")
     else:
-        e_l1.config(text="Enter value between -3 and 3")
+        if 0 <= int(e4.get()) < 4:
+            for i in range(int(e4.get())):
+                I_up = cv2.pyrUp(src=I_up)
+                upsmpl()
+
+            cv2.imshow(winname="I_up", mat=I_up)
+            I1 = temp_path + "\\" + str(counter) + "_I_up_" + str(subcounter) + ".jpg"
+            cv2.imwrite(filename=I1, img=I_up)
+            cv2.imshow("I_up_rec", I_rec)
+            subcounter_up += 1
+            e_l1.config(text="OK")
+            return I_up
+
+        elif -4 < int(e4.get()) <= 0:
+            a = abs(int(e4.get()))
+            for i in range(a):
+                I_down = cv2.pyrDown(src=I_down)
+                dwsmpl()
+
+            cv2.imshow(winname="I_down", mat=I_down)
+            I2 = temp_path + "\\" + str(counter) + "_I_down_" + str(subcounter) + ".jpg"
+            cv2.imwrite(filename=I2, img=I_down)
+            cv2.imshow("I_down_rec", I_rec)
+            subcounter_down += 1
+            e_l1.config(text="OK")
+            return I_down
+        else:
+            e_l1.config(text="Enter value between -3 and 3")
 
 def mark_img():
     global subcounter_mark
@@ -375,5 +457,3 @@ root.protocol(name="WM_DELETE_WINDOW", func=on_closing)
 workspace.protocol(name="WM_DELETE_WINDOW", func=block_closing)
 error.protocol(name="WM_DELETE_WINDOW", func=block_closing)
 root.mainloop()
-
-
